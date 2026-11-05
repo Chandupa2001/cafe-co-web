@@ -1,0 +1,116 @@
+---
+import OpenStatus from './OpenStatus.astro';
+import { site } from '../data/site';
+---
+
+<section id="visit" class="section visit wrap">
+  <div class="info">
+    <div class="reveal">
+      <h2 class="display">Come say hi</h2>
+      <p class="lede">Your neighbourhood cafe in Maharagama. We’d love to see you.</p>
+      <p class="status-line"><OpenStatus /></p>
+    </div>
+
+    <dl class="details reveal">
+      <div>
+        <dt class="eyebrow">Address</dt>
+        <dd><address>{site.address.full}</address></dd>
+      </div>
+      <div>
+        <dt class="eyebrow">Hours</dt>
+        <dd>{site.hours.days}, {site.hours.display}</dd>
+      </div>
+      <div>
+        <dt class="eyebrow">Phone</dt>
+        <dd><a class="link" href={site.links.call}>{site.phone.display}</a></dd>
+      </div>
+    </dl>
+
+    <div class="actions reveal">
+      <a class="btn" href={site.links.directions} target="_blank" rel="noopener">Get directions</a>
+      <a class="btn btn-ghost" href={site.links.whatsapp} target="_blank" rel="noopener">WhatsApp</a>
+      <a class="btn btn-ghost" href={site.links.call}>Call</a>
+    </div>
+  </div>
+
+  <div class="map reveal">
+    <iframe
+      src={site.links.mapEmbed}
+      title={`Map showing ${site.name} at ${site.address.full}`}
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"></iframe>
+  </div>
+</section>
+
+<style>
+  .visit {
+    display: grid;
+    gap: 3rem;
+  }
+
+  .lede {
+    margin-top: 1.25rem;
+    font-size: 1.0625rem;
+  }
+
+  .status-line {
+    margin-top: 1rem;
+  }
+
+  .details {
+    margin-top: 2.5rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .details > div {
+    display: grid;
+    gap: 0.25rem;
+    padding-block: 1rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  dd {
+    color: var(--ink);
+  }
+
+  address {
+    font-style: normal;
+  }
+
+  dd .link {
+    min-height: 2.75rem;
+    margin-block: -0.5rem;
+    font-weight: 400;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+    margin-top: 2.5rem;
+  }
+
+  .map {
+    min-height: 22rem;
+    border-radius: var(--radius);
+    background: var(--sand);
+    overflow: hidden;
+  }
+
+  /* Softens the map's colours so it sits quietly on the page */
+  iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 22rem;
+    border: 0;
+    filter: saturate(0.35);
+  }
+
+  @media (min-width: 960px) {
+    .visit {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+      gap: clamp(3rem, 7vw, 6rem);
+    }
+  }
+</style>

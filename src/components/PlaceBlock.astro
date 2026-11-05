@@ -1,0 +1,89 @@
+---
+import Photo from './Photo.astro';
+import { site } from '../data/site';
+---
+
+<section class="place wrap">
+  <div class="main-photo reveal">
+    <Photo
+      name="property"
+      tint="clay"
+      sizes="(min-width: 960px) 45rem, 100vw"
+      widths={[640, 960, 1280, 1800]}
+    />
+  </div>
+
+  <div class="side">
+    <div class="reveal">
+      <h2 class="display">Pull up a chair.</h2>
+      <p>Whether it’s a quiet hour with a book or a long catch-up with friends, there’s a seat here for you.</p>
+      <a class="link" href={site.links.directions} target="_blank" rel="noopener">Get directions</a>
+    </div>
+
+    <div class="detail reveal">
+      <Photo name="detail" tint="sand" sizes="(min-width: 960px) 26rem, 80vw" widths={[320, 480, 640, 800, 1040]} />
+    </div>
+  </div>
+</section>
+
+<style>
+  .place {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  .main-photo {
+    aspect-ratio: 4 / 5;
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .side {
+    display: grid;
+    gap: 2.5rem;
+    align-content: space-between;
+  }
+
+  p {
+    max-width: 26rem;
+    margin-top: 1.25rem;
+    font-size: 1.0625rem;
+  }
+
+  .link {
+    margin-top: 0.75rem;
+  }
+
+  .detail {
+    width: min(80%, 24rem);
+    aspect-ratio: 4 / 5;
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  @media (min-width: 960px) {
+    .place {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      gap: clamp(3rem, 7vw, 6rem);
+    }
+
+    /* The right column sets the height, so both photos always end level */
+    .main-photo {
+      position: relative;
+      aspect-ratio: auto;
+    }
+
+    .main-photo :global(.photo) {
+      position: absolute;
+      inset: 0;
+    }
+
+    .side {
+      padding-top: 1.5rem;
+    }
+
+    .detail {
+      width: min(100%, 26rem);
+    }
+  }
+</style>

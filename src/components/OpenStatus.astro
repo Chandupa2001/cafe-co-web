@@ -1,0 +1,51 @@
+---
+import { site } from '../data/site';
+---
+
+<span class="status" data-status>
+  <span class="dot" aria-hidden="true"></span>
+  <span data-status-label>Open daily, {site.hours.display}</span>
+</span>
+
+<script>
+  import { getStatus } from '../lib/hours';
+
+  function update() {
+    const status = getStatus();
+    document.querySelectorAll<HTMLElement>('[data-status]').forEach((el) => {
+      el.dataset.open = String(status.open);
+      const label = el.querySelector('[data-status-label]');
+      if (label) label.textContent = status.label;
+    });
+  }
+
+  update();
+  setInterval(update, 60_000);
+</script>
+
+<style>
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--ink);
+    font-size: 0.9375rem;
+    line-height: 1.3;
+  }
+
+  .dot {
+    flex: none;
+    width: 0.4375rem;
+    height: 0.4375rem;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  [data-open='true'] .dot {
+    background: #4d7c59;
+  }
+
+  [data-open='false'] .dot {
+    background: #a8654a;
+  }
+</style>

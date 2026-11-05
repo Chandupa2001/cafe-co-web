@@ -1,0 +1,124 @@
+---
+import OpenStatus from './OpenStatus.astro';
+import Photo from './Photo.astro';
+import { site } from '../data/site';
+---
+
+<section class="hero wrap">
+  <div class="intro">
+    <h1>
+      <span class="brand">Cafe’ Co.</span>
+      <span class="by">by Virasha</span>
+      <span class="desc">Your neighbourhood café in Maharagama</span>
+    </h1>
+
+    <div class="aside">
+      <p class="tagline">{site.tagline}</p>
+      <OpenStatus />
+      <div class="actions">
+        <a class="btn" href={site.links.directions} target="_blank" rel="noopener">Get directions</a>
+        <a class="btn btn-ghost" href={site.links.whatsapp} target="_blank" rel="noopener">WhatsApp us</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="media">
+    <Photo
+      name="hero"
+      eager
+      tint="stone"
+      sizes="(min-width: 80rem) 72rem, (min-width: 768px) 100vw, 224vw"
+      widths={[640, 960, 1280, 1920, 2560]}
+    />
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-top: clamp(2rem, 6vw, 4.5rem);
+  }
+
+  .intro {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 400;
+  }
+
+  h1 span {
+    display: block;
+  }
+
+  .brand {
+    color: var(--accent);
+    font-size: clamp(4rem, 20vw, 8rem);
+    line-height: 0.95;
+    letter-spacing: -0.015em;
+    white-space: nowrap;
+  }
+
+  .by {
+    margin-top: 0.25rem;
+    color: var(--ink-soft);
+    font-size: 1.125rem;
+    font-style: italic;
+    line-height: 1.2;
+  }
+
+  /* Sized so the line sits about as wide as the brand name on desktop, without competing with it */
+  .desc {
+    margin-top: 1rem;
+    color: var(--ink);
+    font-size: clamp(1.25rem, 1rem + 1vw, 1.5rem);
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+
+  .aside {
+    display: grid;
+    justify-items: start;
+    gap: 0.75rem;
+  }
+
+  .tagline {
+    color: var(--ink-soft);
+    font-size: 1.125rem;
+  }
+
+  /* On phones the sticky bar already shows these two buttons */
+  .actions {
+    display: none;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+    margin-top: 0.75rem;
+  }
+
+  /* The tall phone crop zooms into a wide photo, which is why `sizes` above asks for 224vw */
+  .media {
+    aspect-ratio: 4 / 5;
+    margin-top: clamp(2rem, 5vw, 4rem);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  @media (min-width: 768px) {
+    .actions {
+      display: flex;
+    }
+
+    .media {
+      aspect-ratio: 16 / 9;
+    }
+  }
+
+  @media (min-width: 960px) {
+    .intro {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+      align-items: end;
+      gap: 3rem;
+    }
+  }
+</style>

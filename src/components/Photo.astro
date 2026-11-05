@@ -1,0 +1,37 @@
+---
+// Shows the uploaded photo for a slot, or a quiet labelled tile until it arrives.
+import { Picture } from 'astro:assets';
+import { findPhoto } from '../lib/photos';
+import { photoAlt } from '../data/photos';
+
+interface Props {
+  name: string;
+  sizes?: string;
+  widths?: number[];
+  eager?: boolean;
+  tint?: 'sand' | 'stone' | 'clay';
+}
+
+const { name, sizes = '100vw', widths = [480, 800, 1200], eager = false, tint = 'sand' } = Astro.props;
+
+const alt = photoAlt[name] ?? '';
+const image = findPhoto(name);
+---
+
+{image ? (
+  <Picture
+    src={image}
+    formats={['avif', 'webp']}
+    widths={widths}
+    sizes={sizes}
+    alt={alt}
+    class="photo"
+    loading={eager ? 'eager' : 'lazy'}
+    decoding={eager ? 'sync' : 'async'}
+    fetchpriority={eager ? 'high' : 'auto'}
+  />
+) : (
+  <span class:list={['photo', 'ph', `ph-${tint}`]} role="img" aria-label={`Photo coming soon: ${alt}`}>
+    <span>{name}</span>
+  </span>
+)}

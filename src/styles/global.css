@@ -1,0 +1,236 @@
+:root {
+  /* Colour: white page, dark text, one accent taken from the logo */
+  --white: #ffffff;
+  --ink: #2b1d13;
+  --ink-soft: #62544a;
+  --accent: #70441d; /* Logo brown. Change here to re-theme the whole site. */
+  --line: #e7e1d8;
+  --sand: #f3efe8;
+  --stone: #e6dfd4;
+  --clay: #d6cabb;
+
+  /* Type */
+  --font-display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  --font-body: 'DM Sans Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Rhythm */
+  --gutter: clamp(1.25rem, 5vw, 4rem);
+  --section: clamp(5rem, 12vw, 10rem);
+  --radius: 0.375rem;
+  --sticky-bar-height: 4.5rem;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: 1rem;
+}
+
+body {
+  margin: 0;
+  background: var(--white);
+  color: var(--ink-soft);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+p,
+dl,
+dd {
+  margin: 0;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+picture {
+  display: contents;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* Layout */
+.wrap {
+  width: min(100%, 80rem);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.section {
+  padding-block: var(--section);
+}
+
+/* Type */
+.display {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 7vw, 4.25rem);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.eyebrow {
+  color: var(--accent);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.6rem 1.6rem;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--white);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+}
+
+@media (hover: hover) {
+  .btn:hover {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--white);
+  }
+}
+
+/* Quiet text link */
+.link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: var(--ink);
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.3em;
+  transition: color 0.2s ease;
+}
+
+@media (hover: hover) {
+  .link:hover {
+    color: var(--accent);
+  }
+}
+
+/* Photo slots */
+.photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ph {
+  display: flex;
+  align-items: flex-end;
+  padding: 0.75rem 0.9rem;
+  color: var(--ink-soft);
+  font-size: 0.8125rem;
+  line-height: 1.2;
+  overflow: hidden;
+}
+
+.ph-sand {
+  background: var(--sand);
+}
+
+.ph-stone {
+  background: var(--stone);
+}
+
+.ph-clay {
+  background: var(--clay);
+  color: var(--ink);
+}
+
+/* Scroll reveal. Only hides content when JavaScript is running. */
+.js .reveal {
+  opacity: 0;
+  transform: translateY(0.5rem);
+  transition: opacity 0.9s ease, transform 0.9s ease;
+  transition-delay: var(--delay, 0s);
+}
+
+.js .reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+.skip-link {
+  position: absolute;
+  z-index: 100;
+  top: 0.75rem;
+  left: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--ink);
+  color: var(--white);
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+/* Keep the footer clear of the sticky mobile bar */
+@media (max-width: 767.98px) {
+  body {
+    padding-bottom: calc(var(--sticky-bar-height) + env(safe-area-inset-bottom));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .js .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}

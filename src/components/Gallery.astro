@@ -1,0 +1,57 @@
+---
+import Photo from './Photo.astro';
+import { site } from '../data/site';
+
+const tints = ['stone', 'sand', 'clay', 'sand', 'clay', 'stone'] as const;
+---
+
+<section id="gallery" class="gallery wrap">
+  <div class="head reveal">
+    <h2 class="display">A peek inside</h2>
+    <a class="link" href={site.links.instagram} target="_blank" rel="noopener">Follow on Instagram</a>
+  </div>
+
+  <div class="grid">
+    {tints.map((tint, i) => (
+      <div class="tile reveal" style={`--delay: ${(i % 3) * 0.08}s`}>
+        <Photo
+          name={`gallery-${i + 1}`}
+          tint={tint}
+          sizes="(min-width: 768px) 24rem, 50vw"
+          widths={[320, 560, 800]}
+        />
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 2rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    margin-top: 2rem;
+  }
+
+  .tile {
+    aspect-ratio: 4 / 5;
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  @media (min-width: 768px) {
+    .grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      margin-top: 3rem;
+    }
+  }
+</style>

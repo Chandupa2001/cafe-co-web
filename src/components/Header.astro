@@ -1,0 +1,81 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../assets/brand/logo-original.png';
+import { site } from '../data/site';
+---
+
+<header class="header wrap">
+  <a class="logo" href="/" aria-label={`${site.name} home`}>
+    <Image src={logo} alt="" widths={[112, 168, 216, 288]} sizes="(min-width: 768px) 4.5rem, 3.5rem" loading="eager" />
+  </a>
+  <nav aria-label="Main">
+    <a href="#menu">Menu</a>
+    <a href="#gallery">Gallery</a>
+    <a href="#visit">Visit</a>
+    <a class="directions" href={site.links.directions} target="_blank" rel="noopener">Get directions</a>
+  </nav>
+</header>
+
+<style>
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: max(0.75rem, env(safe-area-inset-top)) 0.75rem;
+  }
+
+  .logo {
+    display: block;
+    flex: none;
+    width: 3.5rem;
+  }
+
+  .logo :global(img) {
+    width: 100%;
+    height: auto;
+  }
+
+  nav {
+    display: flex;
+    gap: 1.25rem;
+  }
+
+  nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    color: var(--ink);
+    font-size: 0.9375rem;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  @media (hover: hover) {
+    nav a:hover {
+      color: var(--accent);
+    }
+  }
+
+  /* On phones the sticky bar has this link */
+  nav .directions {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .logo {
+      width: 4.5rem;
+    }
+
+    nav {
+      gap: 2.25rem;
+    }
+
+    nav .directions {
+      display: inline-flex;
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 0.3em;
+    }
+  }
+</style>

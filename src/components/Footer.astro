@@ -1,0 +1,71 @@
+---
+import seal from '../assets/brand/seal-brown.svg';
+import { site } from '../data/site';
+---
+
+<footer class="footer wrap">
+  <img src={seal.src} width={seal.width} height={seal.height} alt={`${site.fullName} logo`} loading="lazy" decoding="async" />
+
+  <div class="contact">
+    <p>{site.address.full}</p>
+    <p>{site.hours.days}, {site.hours.display}</p>
+  </div>
+
+  <ul class="social" role="list">
+    <li><a class="link" href={site.links.instagram} target="_blank" rel="noopener">Instagram</a></li>
+    <li><a class="link" href={site.links.facebook} target="_blank" rel="noopener">Facebook</a></li>
+  </ul>
+
+  <p class="legal">© {new Date().getFullYear()} {site.fullName}</p>
+</footer>
+
+<style>
+  .footer {
+    display: grid;
+    gap: 1.5rem;
+    padding-block: 3rem;
+  }
+
+  .footer::before {
+    content: '';
+    display: block;
+    height: 1px;
+    margin-bottom: 1.5rem;
+    background: var(--line);
+    grid-column: 1 / -1;
+  }
+
+  img {
+    width: 6.5rem;
+    height: auto;
+  }
+
+  .social {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .social .link {
+    font-weight: 400;
+  }
+
+  .legal {
+    font-size: 0.875rem;
+  }
+
+  @media (min-width: 768px) {
+    .footer {
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 1.5rem 3rem;
+    }
+
+    .legal {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

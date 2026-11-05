@@ -1,0 +1,28 @@
+---
+import { site } from '../data/site';
+---
+
+<nav class="sticky" aria-label="Quick actions">
+  <a class="btn" href={site.links.directions} target="_blank" rel="noopener">Directions</a>
+  <a class="btn btn-ghost" href={site.links.whatsapp} target="_blank" rel="noopener">WhatsApp</a>
+</nav>
+
+<style>
+  .sticky {
+    position: fixed;
+    z-index: 20;
+    inset: auto 0 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    padding: 0.625rem 0.75rem calc(0.75rem + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--line);
+    background: var(--white);
+  }
+
+  @media (min-width: 768px) {
+    .sticky {
+      display: none;
+    }
+  }
+</style>
