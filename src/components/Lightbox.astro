@@ -1,0 +1,194 @@
+---
+// A calm, full-screen look at a gallery photo. Built on the native <dialog>, so
+// focus stays inside while it's open and returns to the photo afterwards.
+// Opened by any element with data-lightbox-item (see Gallery.astro).
+const blank = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+---
+
+<dialog class="lightbox" data-lightbox aria-label="Photo viewer">
+  <button type="button" class="ctl close" data-lightbox-close autofocus>Close</button>
+  <div class="stage" data-lightbox-stage>
+    <img src={blank} alt="" data-lightbox-image />
+  </div>
+  <div class="bar">
+    <button type="button" class="ctl" data-lightbox-prev>Previous</button>
+    <span class="count" data-lightbox-count aria-live="polite"></span>
+    <button type="button" class="ctl" data-lightbox-next>Next</button>
+  </div>
+</dialog>
+
+<script>
+  import { gsap } from 'gsap';
+  import { dur, ease, prefersReducedMotion } from '../lib/motion';
+
+  const dialog = document.querySelector<HTMLDialogElement>('[data-lightbox]');
+  const items = [...document.querySelectorAll<HTMLElement>('[data-lightbox-item]')];
+  const image = dialog?.querySelector<HTMLImageElement>('[data-lightbox-image]');
+  const count = dialog?.querySelector<HTMLElement>('[data-lightbox-count]');
+
+  if (dialog && image && count && items.length) {
+    let index = 0;
+    let trigger: HTMLElement | null = null;
+    let busy = false;
+    const calm = prefersReducedMotion;
+
+    const load = (i: number) => {
+      const item = items[i];
+      image.src = item.dataset.full ?? '';
+      image.alt = item.dataset.alt ?? '';
+      count.textContent = `${i + 1} of ${items.length}`;
+      return image.decode().catch(() => undefined);
+    };
+
+    const showImage = (fromScale = 0.96, duration = dur.short) => {
+      if (calm()) {
+        gsap.set(image, { opacity: 1, scale: 1 });
+        return Promise.resolve();
+      }
+      return gsap.fromTo(image, { opacity: 0, scale: fromScale }, { opacity: 1, scale: 1, duration, ease: ease.pour }).then();
+    };
+
+    const open = (i: number, from: HTMLElement) => {
+      index = i;
+      trigger = from;
+      gsap.set(image, { opacity: 0 });
+      dialog.showModal();
+      if (!calm()) gsap.fromTo(dialog, { opacity: 0 }, { opacity: 1, duration: dur.short, ease: ease.steam });
+      load(i).then(() => showImage());
+    };
+
+    const close = async () => {
+      if (!dialog.open) return;
+      if (!calm()) await gsap.to(dialog, { opacity: 0, duration: 0.4, ease: ease.steam }).then();
+      dialog.close();
+      gsap.set(dialog, { clearProps: 'opacity' });
+      trigger?.focus();
+    };
+
+    // One photo fades out, the next fades in
+    const go = async (delta: number) => {
+      if (busy) return;
+      busy = true;
+      index = (index + delta + items.length) % items.length;
+      if (!calm()) await gsap.to(image, { opacity: 0, duration: 0.3, ease: ease.steam }).then();
+      await load(index);
+      await showImage(1, 0.4);
+      busy = false;
+    };
+
+    items.forEach((item, i) => item.addEventListener('click', () => open(i, item)));
+    dialog.querySelector('[data-lightbox-close]')?.addEventListener('click', close);
+    dialog.querySelector('[data-lightbox-prev]')?.addEventListener('click', () => go(-1));
+    dialog.querySelector('[data-lightbox-next]')?.addEventListener('click', () => go(1));
+
+    // Escape closes it gently rather than all at once
+    dialog.addEventListener('cancel', (event) => {
+      event.preventDefault();
+      close();
+    });
+
+    dialog.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') go(-1);
+      if (event.key === 'ArrowRight') go(1);
+    });
+
+    // A click on the dark surround, outside the photo and buttons, closes it
+    dialog.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement;
+      if (target === dialog || target.hasAttribute('data-lightbox-stage')) close();
+    });
+  }
+</script>
+
+<style>
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: var(--gutter);
+    padding-top: max(var(--gutter), env(safe-area-inset-top));
+    padding-bottom: max(var(--gutter), env(safe-area-inset-bottom));
+    border: 0;
+    background: rgb(43 29 19 / 0.96); /* --ink, a breath lighter */
+    color: var(--white);
+  }
+
+  .lightbox[open] {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: 1rem;
+  }
+
+  .lightbox::backdrop {
+    background: transparent;
+  }
+
+  :global(html:has(.lightbox[open])) {
+    overflow: hidden;
+  }
+
+  .close {
+    justify-self: end;
+  }
+
+  .stage {
+    position: relative;
+    min-height: 0;
+  }
+
+  /* Fits the photo whole within the space between the buttons */
+  .stage img {
+    position: absolute;
+    inset: 0;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: 100%;
+    margin: auto;
+    border-radius: var(--radius);
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+  }
+
+  .count {
+    min-width: 4.5rem;
+    font-size: 0.875rem;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    opacity: 0.8;
+  }
+
+  .ctl {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0.5rem 1.25rem;
+    border: 1px solid rgb(255 255 255 / 0.4);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--white);
+    font: inherit;
+    font-size: 0.9375rem;
+    cursor: pointer;
+    transition: border-color var(--dur-micro) var(--ease-settle);
+  }
+
+  .ctl:focus-visible {
+    outline-color: var(--white);
+  }
+
+  @media (hover: hover) {
+    .ctl:hover {
+      border-color: var(--white);
+    }
+  }
+</style>

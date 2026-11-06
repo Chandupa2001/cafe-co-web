@@ -1,0 +1,100 @@
+---
+// Story, stage 1: two beans resting beside "Cafe' Co.", floating gently.
+// As you scroll, these same two beans travel all the way down the page and land
+// in the grinder's hopper (src/scripts/story.ts). Purely decorative, so hidden
+// from assistive tech. Each bean has two layers:
+//   .fall  moved by the story script along its journey
+//   .float a slow CSS bob while it rests here
+// With reduced motion they simply rest here.
+import Bean from './Bean.astro';
+---
+
+<span class="hero-beans" aria-hidden="true" data-hero="fade" data-delay="0.9">
+  <span class="fall a" data-story-bean>
+    <span class="float"><Bean variant={1} /></span>
+  </span>
+  <span class="fall b" data-story-bean>
+    <span class="float"><Bean variant={2} /></span>
+  </span>
+</span>
+
+<style>
+  .hero-beans {
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .fall {
+    position: absolute;
+    display: block;
+    width: 1.875rem; /* 30px on phones */
+  }
+
+  .float {
+    display: block;
+    animation: float 4.2s var(--ease-steam) infinite alternate;
+  }
+
+  .b .float {
+    animation-duration: 5s;
+    animation-delay: -1.7s;
+  }
+
+  /* Once they let go and start their journey, the scroll moves them, not the bob */
+  .hero-beans.is-travelling .float {
+    animation: none;
+  }
+
+  .float :global(svg) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .a :global(svg) {
+    rotate: -28deg;
+  }
+
+  .b :global(svg) {
+    rotate: 22deg;
+  }
+
+  /* Just beside the name, clear of the letters (fits a 320px screen) */
+  .a {
+    top: 4%;
+    left: calc(100% + 0.6rem);
+  }
+
+  .b {
+    top: 44%;
+    left: calc(100% + 1.9rem);
+  }
+
+  /* Larger screens: beside the name, as in the style test */
+  @media (min-width: 768px) {
+    .fall {
+      width: 2.75rem; /* 44px */
+    }
+
+    .a {
+      top: 14%;
+      left: calc(100% + 1.75rem);
+    }
+
+    .b {
+      top: 48%;
+      left: calc(100% + 3.6rem);
+    }
+  }
+
+  @keyframes float {
+    from {
+      transform: translateY(-4px) rotate(-3deg);
+    }
+    to {
+      transform: translateY(4px) rotate(2deg);
+    }
+  }
+</style>

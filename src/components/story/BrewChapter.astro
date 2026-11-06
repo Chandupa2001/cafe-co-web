@@ -1,0 +1,224 @@
+---
+// "From bean to cup": the scroll-scrubbed chapter of the story (stages 2 to 5),
+// with a short line about the craft beside the drawing.
+//
+// With the story running (html.story), the section is tall and its stage sticks
+// to the screen while you scroll through it, so the drawing plays in place.
+// Natively sticky, so nothing is pinned or hijacked. Without the story (reduced
+// motion, or no JavaScript) it's a normal section showing the picture.
+//
+// The statement is split into words here, at build time, so the story script
+// can bring them in one by one as the grinder draws itself. The heading keeps
+// its full sentence as its accessible name.
+//
+// The story ends on the finished cup, and the statement gives way to an
+// invitation with links into the page. In the story the two share one spot
+// (so nothing below moves); without it, both simply show, one after the other.
+import Grinder from './Grinder.astro';
+import { site } from '../../data/site';
+
+const lead = 'Ground fresh, pulled slowly, poured with care.';
+const close = 'Every cup, every time.';
+const words = (text: string) => text.split(' ');
+---
+
+<section class="brew" id="bean-to-cup" aria-labelledby="brew-title" data-brew>
+  <div class="stage wrap" data-brew-stage>
+    <div class="words">
+      <div class="say" data-brew-say>
+        <p class="eyebrow" data-brew-fade>From bean to cup</p>
+        <h2 id="brew-title" class="statement" aria-label={`${lead} ${close}`}>
+          <span aria-hidden="true">
+            {words(lead).map((word) => <><span class="w" data-brew-word>{word}</span>{' '}</>)}
+            <em>{words(close).map((word, i, all) => <><span class="w" data-brew-word>{word}</span>{i < all.length - 1 && ' '}</>)}</em>
+          </span>
+        </h2>
+        <p class="note" data-brew-fade>Watch a cup come together, from two whole beans to the last drop.</p>
+      </div>
+
+      <!-- The story's ending: an invitation into the rest of the page -->
+      <div class="invite" data-brew-invite>
+        <p class="eyebrow">{site.hours.days}, {site.hours.display}</p>
+        <h3 class="invite-title">Your cup is ready.</h3>
+        <p class="note">Come and have it with us in Maharagama.</p>
+        <div class="invite-actions">
+          <a class="btn" href="#visit">Plan your visit</a>
+          <a class="link" href="#menu">See the menu</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="art">
+      <Grinder class="grinder-art" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .brew {
+    /* How much scrolling the chapter plays over, beyond one screen.
+       Grows as each stage is added. */
+    --brew-scroll: 350vh;
+    position: relative;
+    background-color: #EED9C4;
+    margin-top: 2rem
+  }
+
+  .stage {
+    display: grid;
+    align-items: center;
+    gap: 2rem;
+    padding-block: var(--section);
+  }
+
+  .words {
+    display: grid;
+    gap: 3rem;
+    align-content: center;
+  }
+
+  .say,
+  .invite {
+    display: grid;
+    gap: 1.25rem;
+    align-content: center;
+  }
+
+  /* In the story, the statement and the invitation take turns in one spot */
+  :global(html.story) .say,
+  :global(html.story) .invite {
+    grid-area: 1 / 1;
+  }
+
+  :global(html.story) .invite {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .invite-title {
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(2.75rem, min(5.2vw, 7.6svh), 4.75rem);
+    font-weight: 400;
+    line-height: 1.05;
+  }
+
+  .invite-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1.5rem;
+    margin-top: 0.25rem;
+  }
+
+  .statement {
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, min(4.2vw, 6.2svh), 4rem);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  .w {
+    display: inline-block;
+  }
+
+  .note {
+    font-size: 1.25rem;
+  }
+
+  .brew .eyebrow {
+    font-size: 0.9375rem;
+  }
+
+  .art {
+    display: flex;
+    justify-content: center;
+  }
+
+  :global(.grinder-art) {
+    width: auto;
+    height: min(60vh, 28rem);
+  }
+
+  /* The story: a tall section with a stage that stays on screen */
+  :global(html.story) .brew {
+    height: calc(100svh + var(--brew-scroll));
+  }
+
+  :global(html.story) .stage {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    padding-block: calc(var(--header-height) * 0.5) 1rem;
+  }
+
+  @media (max-width: 767.98px) {
+    .stage {
+      justify-items: center;
+      text-align: center;
+    }
+
+    .say,
+    .invite {
+      gap: 0.75rem;
+      justify-items: center;
+    }
+
+    .invite-title {
+      font-size: clamp(2rem, min(9vw, 5.2svh), 2.75rem);
+    }
+
+    .invite-actions {
+      justify-content: center;
+    }
+
+    .statement {
+      font-size: clamp(1.6rem, min(7vw, 3.9svh), 2.4rem);
+    }
+
+    .note {
+      font-size: 1.0625rem;
+    }
+
+    .brew .eyebrow {
+      font-size: 0.875rem;
+    }
+
+    /* On phones the picture comes first, the words beneath it */
+    .art {
+      order: -1;
+    }
+
+    :global(html.story) .stage {
+      grid-template-rows: auto auto;
+      align-content: center;
+      gap: 1rem;
+      padding-bottom: calc(var(--sticky-bar-height) + 1rem);
+    }
+
+    :global(html.story .grinder-art) {
+      height: min(40svh, 24rem);
+    }
+  }
+
+  /* Short phones (like a small iPhone): a smaller picture so the words still fit */
+  @media (max-width: 767.98px) and (max-height: 700px) {
+    :global(html.story .grinder-art) {
+      height: 34svh;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .stage {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+      gap: clamp(2rem, 6vw, 6rem);
+    }
+
+    :global(html.story .grinder-art) {
+      height: min(72svh, 36rem);
+    }
+  }
+</style>

@@ -1,18 +1,19 @@
 ---
 import OpenStatus from './OpenStatus.astro';
 import Photo from './Photo.astro';
+import HeroBeans from './story/HeroBeans.astro';
 import { site } from '../data/site';
 ---
 
-<section class="hero wrap">
+<section class="hero wrap" data-hero-root>
   <div class="intro">
     <h1>
-      <span class="brand">Cafe’ Co.</span>
-      <span class="by">by Virasha</span>
-      <span class="desc">Your neighbourhood café in Maharagama</span>
+      <span class="brand"><span class="mask"><span data-hero="line">Cafe’ Co.</span></span><HeroBeans /></span>
+      <span class="by" data-hero="fade" data-delay="0.35">by Virasha</span>
+      <span class="desc" data-hero="fade" data-delay="0.55">Your neighbourhood café in Maharagama</span>
     </h1>
 
-    <div class="aside">
+    <div class="aside" data-hero="aside">
       <p class="tagline">{site.tagline}</p>
       <OpenStatus />
       <div class="actions">
@@ -22,7 +23,7 @@ import { site } from '../data/site';
     </div>
   </div>
 
-  <div class="media">
+  <div class="media" data-hero="media">
     <Photo
       name="hero"
       eager
@@ -52,12 +53,23 @@ import { site } from '../data/site';
     display: block;
   }
 
+  /* Only as wide as the name itself, so the beans can sit just beside it */
   .brand {
+    position: relative;
+    width: fit-content;
     color: var(--accent);
     font-size: clamp(4rem, 20vw, 8rem);
     line-height: 0.95;
     letter-spacing: -0.015em;
     white-space: nowrap;
+  }
+
+  /* The name rises into view from just below its own line. Only the bottom edge
+     clips, with a little room so the letters' curves are never cut. */
+  .mask {
+    padding-bottom: 0.08em;
+    margin-bottom: -0.08em;
+    clip-path: inset(-50% -10% 0 -10%);
   }
 
   .by {

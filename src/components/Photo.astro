@@ -28,7 +28,7 @@ const image = findPhoto(name);
     class="photo"
     loading={eager ? 'eager' : 'lazy'}
     decoding={eager ? 'sync' : 'async'}
-    fetchpriority={eager ? 'high' : 'auto'}
+    fetchpriority={eager ? 'high' : 'low'}
   />
 ) : (
   <span class:list={['photo', 'ph', `ph-${tint}`]} role="img" aria-label={`Photo coming soon: ${alt}`}>

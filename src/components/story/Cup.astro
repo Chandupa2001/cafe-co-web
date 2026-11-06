@@ -1,0 +1,114 @@
+---
+// A classic cup and saucer in three-quarter view, in fine line.
+// The espresso and its crema sit inside the rim, clipped to the cup's opening,
+// so they can rise from empty to full.
+//
+// Hooks for the story script (when drawn in the brewing scene):
+//   [data-cup-coffee]  the espresso and crema together
+//   [data-cup-liquid]  the espresso's surface (lowered to look emptier)
+//   [data-cup-crema]   the crema on top
+//   [data-cup-steam]   the steam wisps
+interface Props {
+  /** Show the espresso and crema. */
+  full?: boolean;
+  /** Draw the steam wisps above the rim. */
+  steam?: boolean;
+  class?: string;
+  style?: string;
+  /** Position and size when drawn inside another drawing (as a nested SVG). */
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+}
+
+import Steam from './Steam.astro';
+
+const { full = true, steam = false, class: className, style, x, y, width, height } = Astro.props;
+const uid = `cup-${Math.random().toString(36).slice(2, 8)}`;
+
+// The cup's body, closed along the front of the rim
+const body =
+  'M58 112C58 160 72 198 96 208C110 212 130 212 144 208C168 198 182 160 182 112A62 14 0 0 1 58 112Z';
+const handle =
+  'M181 128C206 118 222 136 214 158C208 174 190 182 172 178L176 168C188 171 198 168 202 158C206 146 198 135 180 141Z';
+---
+
+<svg
+  class:list={['ink cup', className]}
+  style={style}
+  viewBox="0 0 240 250"
+  x={x}
+  y={y}
+  width={width}
+  height={height}
+  aria-hidden="true"
+  focusable="false"
+>
+  <defs>
+    <clipPath id={`${uid}-body`}>
+      <path d={body}></path>
+    </clipPath>
+    <clipPath id={`${uid}-mouth`}>
+      <ellipse cx="120" cy="113.5" rx="57" ry="11.5"></ellipse>
+    </clipPath>
+  </defs>
+
+  <!-- Saucer -->
+  <g class="saucer">
+    <ellipse class="fw" cx="120" cy="218" rx="104" ry="21"></ellipse>
+    <path
+      class="h"
+      fill="url(#ink-hatch)"
+      d="M16 218C17 231 64 242 120 242C176 242 223 231 224 218A104 21 0 0 1 16 218Z"
+    ></path>
+    <path class="o" d="M16 218C17 231 64 242 120 242C176 242 223 231 224 218"></path>
+    <ellipse class="o" cx="120" cy="218" rx="104" ry="21"></ellipse>
+    <ellipse class="d" cx="120" cy="215" rx="60" ry="11"></ellipse>
+    <path class="d" d="M38 223C60 233 92 236.5 120 236.5"></path>
+  </g>
+
+  <!-- Handle -->
+  <g class="handle">
+    <path class="fw" d={handle}></path>
+    <path class="h" fill="url(#ink-hatch)" d="M204 128C214 136 218 148 213 160C208 172 196 179 182 179L176 168C188 171 198 168 202 158C205 150 203 141 198 136Z"></path>
+    <path class="o" d="M181 128C206 118 222 136 214 158C208 174 190 182 172 178"></path>
+    <path class="o" d="M180 141C198 135 206 146 202 158C198 168 188 171 176 168"></path>
+  </g>
+
+  <!-- Body, shaded on the side away from the light -->
+  <g class="body">
+    <path class="fw" d={body}></path>
+    <g clip-path={`url(#${uid}-body)`}>
+      <path class="h" fill="url(#ink-hatch)" d="M148 112C151 150 146 186 126 214H200V100Z"></path>
+      <path class="h" fill="url(#ink-cross)" d="M168 112C171 150 164 186 146 212H200V100Z"></path>
+    </g>
+    <path class="d" d="M70 128C71 158 80 184 96 201"></path>
+    <path class="d" d="M140 128C142 160 136 188 122 206"></path>
+    <path class="o" d="M58 112C58 160 72 198 96 208C110 212 130 212 144 208C168 198 182 160 182 112"></path>
+    <path class="d" d="M96 208C99 212.5 141 212.5 144 208"></path>
+  </g>
+
+  <!-- Rim and the inside of the cup -->
+  <g class="rim">
+    <ellipse class="fw" cx="120" cy="112" rx="62" ry="14"></ellipse>
+    <ellipse class="fs t" cx="120" cy="113.5" rx="57" ry="11.5"></ellipse>
+    <ellipse class="h" cx="120" cy="113.5" rx="57" ry="11.5" fill="url(#ink-hatch)" style="opacity: calc(var(--hatch, 0.55) * 0.5)"></ellipse>
+  </g>
+
+  <!-- Espresso and crema -->
+  <g class="coffee" data-cup-coffee clip-path={`url(#${uid}-mouth)`} style={full ? undefined : 'display: none'}>
+    <ellipse class="liquid fk" data-cup-liquid cx="120" cy="117" rx="58" ry="11"></ellipse>
+    <g class="crema" data-cup-crema>
+      <ellipse class="fc" cx="120" cy="117.5" rx="50" ry="8.8"></ellipse>
+      <ellipse cx="120" cy="117.5" rx="50" ry="8.8" fill="url(#ink-stipple)" opacity="0.55"></ellipse>
+      <path class="d k" style="opacity: 0.45" d="M84 118C98 112.5 112 121.5 128 116C139 112.5 149 117 156 115.5"></path>
+      <ellipse class="d" cx="120" cy="117.5" rx="50" ry="8.8"></ellipse>
+    </g>
+  </g>
+
+  <ellipse class="d" cx="120" cy="113.5" rx="57" ry="11.5"></ellipse>
+  <ellipse class="o" cx="120" cy="112" rx="62" ry="14"></ellipse>
+
+  {steam && <Steam />}
+</svg>

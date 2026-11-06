@@ -8,24 +8,24 @@ const categories = [...new Set(menu.map((item) => item.category))];
 ---
 
 <section id="menu" class="section wrap menu">
-  <div class="photo-col reveal">
+  <div class="photo-col" data-reveal="fade" data-parallax="0.03">
     <Photo name="menu" tint="stone" sizes="(min-width: 960px) 30rem, 100vw" widths={[480, 800, 1200]} />
   </div>
 
   <div class="list-col">
-    <div class="reveal">
+    <div data-reveal="rise">
       <h2 class="display">From our counter</h2>
       {sample && <p class="sample">Sample menu. These items and prices are placeholders.</p>}
     </div>
 
     {categories.map((category) => (
-      <div class="group reveal">
-        <h3 class="eyebrow">{category}</h3>
+      <div class="group" data-stagger>
+        <h3 class="eyebrow" data-reveal-child>{category}</h3>
         <ul role="list">
           {menu
             .filter((item) => item.category === category)
             .map((item) => (
-              <li>
+              <li data-reveal-child>
                 <div>
                   <p class="name">{item.name}</p>
                   <p>{item.description}</p>
@@ -37,7 +37,7 @@ const categories = [...new Set(menu.map((item) => item.category))];
       </div>
     ))}
 
-    <div class="reveal">
+    <div data-reveal="rise">
       <a class="btn" href={site.links.whatsapp} target="_blank" rel="noopener">Order or reserve on WhatsApp</a>
     </div>
   </div>
@@ -75,12 +75,37 @@ const categories = [...new Set(menu.map((item) => item.category))];
   }
 
   li {
+    position: relative;
     display: flex;
     align-items: baseline;
     justify-content: space-between;
     gap: 1.5rem;
     padding-block: 1.125rem;
     border-bottom: 1px solid var(--line);
+  }
+
+  /* On hover the rule beneath an item draws across in the accent, like a pen along a menu card */
+  li::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: -1px;
+    left: 0;
+    height: 1px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 700ms var(--ease-settle);
+  }
+
+  @media (hover: hover) {
+    li:hover::after {
+      transform: scaleX(1);
+    }
+
+    li:hover .price {
+      color: var(--accent);
+    }
   }
 
   .name {
@@ -94,6 +119,7 @@ const categories = [...new Set(menu.map((item) => item.category))];
     flex: none;
     color: var(--ink);
     font-variant-numeric: tabular-nums;
+    transition: color var(--dur-micro) var(--ease-settle);
   }
 
   @media (min-width: 960px) {

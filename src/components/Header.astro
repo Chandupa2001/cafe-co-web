@@ -4,19 +4,84 @@ import logo from '../assets/brand/logo-original.png';
 import { site } from '../data/site';
 ---
 
-<header class="header wrap">
-  <a class="logo" href="/" aria-label={`${site.name} home`}>
-    <Image src={logo} alt="" widths={[112, 168, 216, 288]} sizes="(min-width: 768px) 4.5rem, 3.5rem" loading="eager" />
-  </a>
-  <nav aria-label="Main">
-    <a href="#menu">Menu</a>
-    <a href="#gallery">Gallery</a>
-    <a href="#visit">Visit</a>
-    <a class="directions" href={site.links.directions} target="_blank" rel="noopener">Get directions</a>
-  </nav>
+<header class="site-header" data-header>
+  <div class="header wrap">
+    <a class="logo" href="/" aria-label={`${site.name} home`}>
+      <Image src={logo} alt="" widths={[112, 168, 216, 288]} sizes="(min-width: 768px) 4.5rem, 3.5rem" loading="eager" />
+    </a>
+    <nav aria-label="Main">
+      <a href="#menu">Menu</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#visit">Visit</a>
+      <a class="directions" href={site.links.directions} target="_blank" rel="noopener">Get directions</a>
+    </nav>
+  </div>
 </header>
 
+<script>
+  // Steps aside while you read down the page, and comes back as soon as you scroll up
+  const header = document.querySelector<HTMLElement>('[data-header]');
+
+  if (header) {
+    let last = window.scrollY;
+    let ticking = false;
+
+    const update = () => {
+      const y = window.scrollY;
+      header.classList.toggle('is-scrolled', y > 80);
+      if (y > last + 4 && y > 160) header.classList.add('is-hidden');
+      else if (y < last - 4 || y <= 160) header.classList.remove('is-hidden');
+      last = y;
+      ticking = false;
+    };
+
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(update);
+        }
+      },
+      { passive: true },
+    );
+    update();
+  }
+</script>
+
 <style>
+  .site-header {
+    position: sticky;
+    z-index: 30;
+    top: 0;
+    background: var(--white);
+    transition: transform var(--dur-short) var(--ease-steam);
+  }
+
+  /* A hairline appears once the page moves beneath the header */
+  .site-header::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    height: 1px;
+    background: var(--line);
+    opacity: 0;
+    transition: opacity var(--dur-short) var(--ease-steam);
+  }
+
+  .site-header.is-scrolled::after {
+    opacity: 1;
+  }
+
+  .site-header.is-hidden {
+    transform: translateY(-100%);
+  }
+
+  /* Never hide it from someone tabbing through it */
+  .site-header:focus-within {
+    transform: none;
+  }
+
   .header {
     display: flex;
     align-items: center;
@@ -42,18 +107,37 @@ import { site } from '../data/site';
   }
 
   nav a {
+    position: relative;
     display: inline-flex;
     align-items: center;
     min-height: 2.75rem;
     color: var(--ink);
     font-size: 0.9375rem;
     text-decoration: none;
-    transition: color 0.2s ease;
+    transition: color var(--dur-micro) var(--ease-settle);
+  }
+
+  /* A fine underline that draws in from the left on hover */
+  nav a:not(.directions)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 0.55rem;
+    left: 0;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur-micro) var(--ease-settle);
   }
 
   @media (hover: hover) {
     nav a:hover {
       color: var(--accent);
+    }
+
+    nav a:hover::after {
+      transform: scaleX(1);
     }
   }
 
@@ -76,6 +160,15 @@ import { site } from '../data/site';
       text-decoration: underline;
       text-decoration-thickness: 1px;
       text-underline-offset: 0.3em;
+      transition:
+        color var(--dur-micro) var(--ease-settle),
+        text-underline-offset var(--dur-micro) var(--ease-settle);
+    }
+
+    @media (hover: hover) {
+      nav .directions:hover {
+        text-underline-offset: 0.22em;
+      }
     }
   }
 </style>

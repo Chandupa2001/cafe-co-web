@@ -1,0 +1,299 @@
+---
+// Kind words from guests. One quote at a time, crossfading every seven seconds.
+// A fine line under each indicator fills slowly to show when the next one comes.
+// It pauses on hover, on focus, off screen, in a background tab, or with the
+// Pause button, and never moves on its own with reduced motion.
+// Quotes live in src/data/testimonials.ts.
+import { sample, testimonials } from '../data/testimonials';
+
+const total = testimonials.length;
+---
+
+<section class="reviews" aria-labelledby="reviews-title" data-reviews>
+  <div class="wrap inner">
+    <h2 id="reviews-title" class="eyebrow" data-reveal="fade">Kind words</h2>
+    {sample && <p class="sample">Sample reviews. These quotes are placeholders.</p>}
+
+    <div class="quotes" data-reveal="rise" data-delay="0.1" aria-live="off" data-reviews-track>
+      {testimonials.map((item, i) => (
+        <figure class:list={['quote', { 'is-active': i === 0 }]} data-review>
+          <blockquote>
+            <p>“{item.quote}”</p>
+          </blockquote>
+          <figcaption>{item.name}</figcaption>
+        </figure>
+      ))}
+    </div>
+
+    {total > 1 && (
+      <div class="controls" data-reveal="fade" data-delay="0.3">
+        <div class="dots">
+          {testimonials.map((_, i) => (
+            <button
+              type="button"
+              class="dot"
+              aria-label={`Show review ${i + 1} of ${total}`}
+              aria-current={i === 0 ? 'true' : undefined}
+              data-review-dot
+            >
+              <span class="fill"></span>
+            </button>
+          ))}
+        </div>
+        <button type="button" class="toggle" data-reviews-toggle aria-label="Pause the reviews">
+          <svg class="icon icon-pause" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+            <rect x="4" y="3" width="2.5" height="10" rx="0.8"></rect>
+            <rect x="9.5" y="3" width="2.5" height="10" rx="0.8"></rect>
+          </svg>
+          <svg class="icon icon-play" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+            <path d="M5 3.2v9.6c0 .5.5.8.9.5l7.2-4.8c.4-.3.4-.8 0-1L5.9 2.7c-.4-.3-.9 0-.9.5z"></path>
+          </svg>
+        </button>
+      </div>
+    )}
+  </div>
+</section>
+
+<script>
+  import { prefersReducedMotion } from '../lib/motion';
+
+  const section = document.querySelector<HTMLElement>('[data-reviews]');
+  const track = section?.querySelector<HTMLElement>('[data-reviews-track]');
+  const quotes = [...(section?.querySelectorAll<HTMLElement>('[data-review]') ?? [])];
+  const dots = [...(section?.querySelectorAll<HTMLButtonElement>('[data-review-dot]') ?? [])];
+  const toggle = section?.querySelector<HTMLButtonElement>('[data-reviews-toggle]');
+
+  if (section && track && quotes.length > 1) {
+    let current = 0;
+    let userPaused = false;
+    let onScreen = false;
+
+    const show = (next: number, announce: boolean) => {
+      if (next === current) return;
+      track.setAttribute('aria-live', announce ? 'polite' : 'off');
+      quotes[current].classList.remove('is-active');
+      dots[current]?.removeAttribute('aria-current');
+      current = next;
+      quotes[current].classList.add('is-active');
+      dots[current]?.setAttribute('aria-current', 'true');
+    };
+
+    dots.forEach((dot, i) => dot.addEventListener('click', () => show(i, true)));
+
+    // Moving on by itself is the one thing reduced motion turns off here
+    if (!prefersReducedMotion()) {
+      section.classList.add('is-auto');
+
+      const update = () => {
+        section.classList.toggle('is-paused', userPaused || !onScreen || document.hidden);
+        if (toggle) {
+          toggle.dataset.paused = String(userPaused);
+          toggle.setAttribute('aria-label', userPaused ? 'Play the reviews' : 'Pause the reviews');
+        }
+      };
+
+      // When the slow line under the current quote has filled, the next one fades in
+      dots.forEach((dot) =>
+        dot.querySelector('.fill')?.addEventListener('animationend', () => show((current + 1) % quotes.length, false)),
+      );
+
+      toggle?.addEventListener('click', () => {
+        userPaused = !userPaused;
+        update();
+      });
+
+      new IntersectionObserver(([entry]) => {
+        onScreen = entry.isIntersecting;
+        update();
+      }).observe(section);
+
+      document.addEventListener('visibilitychange', update);
+      update();
+    }
+  }
+</script>
+
+<style>
+  .reviews {
+    padding-top: var(--section);
+  }
+
+  .inner {
+    display: grid;
+    justify-items: center;
+    gap: 1.75rem;
+    max-width: 58rem;
+    text-align: center;
+  }
+
+  .sample {
+    margin-top: -0.75rem;
+    color: var(--accent);
+    font-size: 0.9375rem;
+  }
+
+  .quotes {
+    display: grid;
+    gap: 3rem;
+    width: 100%;
+  }
+
+  figure {
+    margin: 0;
+  }
+
+  blockquote {
+    margin: 0;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 4.5vw, 2.75rem);
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+
+  figcaption {
+    margin-top: 1.5rem;
+    font-size: 0.9375rem;
+  }
+
+  figcaption::before {
+    content: '— ';
+  }
+
+  /* With JavaScript, the quotes share one spot, so the section is always as
+     tall as the longest quote and nothing below it moves. One quote fades away
+     before the next arrives, so two sentences never blur together. */
+  :global(.js) .quote {
+    grid-area: 1 / 1;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition:
+      opacity 450ms var(--ease-steam),
+      transform 0s linear 450ms,
+      visibility 0s linear 450ms;
+  }
+
+  :global(.js) .quote.is-active {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition:
+      opacity 900ms var(--ease-steam) 450ms,
+      transform 1000ms var(--ease-pour) 450ms,
+      visibility 0s linear 450ms;
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem 1.5rem;
+  }
+
+  :global(html:not(.js)) .controls {
+    display: none;
+  }
+
+  .dots {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .dot {
+    position: relative;
+    width: 2.5rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+
+  .dot::before,
+  .fill {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 0.25rem;
+    left: 0.25rem;
+    height: 1px;
+  }
+
+  .dot::before {
+    background: var(--clay);
+  }
+
+  .fill {
+    background: var(--ink);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  .dot[aria-current='true'] .fill {
+    transform: scaleX(1);
+  }
+
+  .is-auto .dot[aria-current='true'] .fill {
+    animation: brew 7s linear forwards;
+  }
+
+  .is-paused .fill,
+  .quotes:hover ~ .controls .fill,
+  .controls:hover .fill,
+  .reviews:focus-within .fill {
+    animation-play-state: paused;
+  }
+
+  @keyframes brew {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  /* Pause / play: a small icon button, with a comfortable tap area */
+  .toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    color: var(--ink);
+    cursor: pointer;
+    transition: color var(--dur-micro) var(--ease-settle);
+  }
+
+  .is-auto .toggle {
+    display: inline-flex;
+  }
+
+  .icon {
+    width: 1rem;
+    height: 1rem;
+    fill: currentColor;
+  }
+
+  /* Shows the action it will take: pause while playing, play while paused */
+  .icon-play,
+  .toggle[data-paused='true'] .icon-pause {
+    display: none;
+  }
+
+  .toggle[data-paused='true'] .icon-play {
+    display: block;
+  }
+
+  @media (hover: hover) {
+    .toggle:hover {
+      color: var(--accent);
+    }
+  }
+</style>

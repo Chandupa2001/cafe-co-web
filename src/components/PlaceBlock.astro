@@ -4,7 +4,7 @@ import { site } from '../data/site';
 ---
 
 <section class="place wrap">
-  <div class="main-photo reveal">
+  <div class="main-photo" data-reveal="mask">
     <Photo
       name="property"
       tint="clay"
@@ -14,13 +14,13 @@ import { site } from '../data/site';
   </div>
 
   <div class="side">
-    <div class="reveal">
+    <div data-reveal="rise" data-delay="0.15">
       <h2 class="display">Pull up a chair.</h2>
       <p>Whether it’s a quiet hour with a book or a long catch-up with friends, there’s a seat here for you.</p>
       <a class="link" href={site.links.directions} target="_blank" rel="noopener">Get directions</a>
     </div>
 
-    <div class="detail reveal">
+    <div class="detail" data-reveal="mask" data-delay="0.2">
       <Photo name="detail" tint="sand" sizes="(min-width: 960px) 26rem, 80vw" widths={[320, 480, 640, 800, 1040]} />
     </div>
   </div>

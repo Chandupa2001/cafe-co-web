@@ -10,8 +10,7 @@ const mapsQuery = encodeURIComponent(`${street}, ${city} ${postcode}, Sri Lanka`
 const whatsappMessage = "Hi Cafe' Co.! I'd like to reserve a table or place an order.";
 
 export const site = {
-  // Replace with the real domain before launch. `npm run check:launch` flags this value.
-  url: 'https://cafe-co.example',
+  url: 'https://cafe-co-web.vercel.app/',
 
   name: "Cafe' Co.",
   fullName: "Cafe' Co. by Virasha",
