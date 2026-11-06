@@ -1,27 +1,51 @@
 ---
+import { getImage } from 'astro:assets';
 import Photo from './Photo.astro';
+import { findPhoto } from '../lib/photos';
+import { photoAlt } from '../data/photos';
 import { site } from '../data/site';
 
 const tints = ['stone', 'sand', 'clay', 'sand', 'clay', 'stone'] as const;
+
+// A larger copy of each photo for the lightbox. It only downloads when opened.
+const tiles = await Promise.all(
+  tints.map(async (tint, i) => {
+    const name = `gallery-${i + 1}`;
+    const image = findPhoto(name);
+    const full = image ? await getImage({ src: image, width: Math.min(1600, image.width), format: 'webp' }) : undefined;
+    return { tint, name, alt: photoAlt[name] ?? '', full: full?.src };
+  }),
+);
 ---
 
 <section id="gallery" class="gallery wrap">
-  <div class="head reveal">
+  <div class="head" data-reveal="rise">
     <h2 class="display">A peek inside</h2>
     <a class="link" href={site.links.instagram} target="_blank" rel="noopener">Follow on Instagram</a>
   </div>
 
   <div class="grid">
-    {tints.map((tint, i) => (
-      <div class="tile reveal" style={`--delay: ${(i % 3) * 0.08}s`}>
-        <Photo
-          name={`gallery-${i + 1}`}
-          tint={tint}
-          sizes="(min-width: 768px) 24rem, 50vw"
-          widths={[320, 560, 800]}
-        />
-      </div>
-    ))}
+    {tiles.map(({ tint, name, alt, full }, i) => {
+      const photo = (
+        <Photo name={name} tint={tint} sizes="(min-width: 768px) 24rem, 50vw" widths={[320, 560, 800]} />
+      );
+      return (
+        <div
+          class="tile"
+          data-reveal="rise"
+          data-delay={String((i % 3) * 0.09)}
+          data-drift={i % 3 === 1 ? '24' : undefined}
+        >
+          {full ? (
+            <button type="button" class="tile-btn" data-lightbox-item data-full={full} data-alt={alt} aria-label={`View larger: ${alt}`}>
+              {photo}
+            </button>
+          ) : (
+            photo
+          )}
+        </div>
+      );
+    })}
   </div>
 </section>
 
@@ -45,6 +69,33 @@ const tints = ['stone', 'sand', 'clay', 'sand', 'clay', 'stone'] as const;
     aspect-ratio: 4 / 5;
     border-radius: var(--radius);
     overflow: hidden;
+  }
+
+  .tile-btn {
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    border-radius: inherit;
+    background: none;
+    cursor: zoom-in;
+  }
+
+  /* The tile clips its edges, so the focus ring sits just inside it */
+  .tile-btn:focus-visible {
+    outline-offset: -2px;
+  }
+
+  .tile-btn :global(.photo) {
+    transition: transform 900ms var(--ease-settle);
+  }
+
+  /* A slow lean in towards the photo, kept inside its frame */
+  @media (hover: hover) and (pointer: fine) {
+    .tile-btn:hover :global(.photo) {
+      transform: scale(1.04);
+    }
   }
 
   @media (min-width: 768px) {

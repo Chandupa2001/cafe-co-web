@@ -6,6 +6,8 @@ import '../styles/global.css';
 import serifUrl from '@fontsource/instrument-serif/files/instrument-serif-latin-400-normal.woff2?url';
 import dmSansUrl from '@fontsource-variable/dm-sans/files/dm-sans-latin-wght-normal.woff2?url';
 import { site } from '../data/site';
+import Preloader from '../components/Preloader.astro';
+import InkDefs from '../components/story/InkDefs.astro';
 
 const canonical = new URL(Astro.url.pathname, site.url).href;
 const ogImage = new URL('/og-image.jpg', site.url).href;
@@ -67,30 +69,40 @@ const structuredData = {
     <meta property="og:image:alt" content="The Cafe' Co. logo" />
     <meta name="twitter:card" content="summary_large_image" />
 
-    <script is:inline>document.documentElement.classList.add('js');</script>
+    <script is:inline>
+      (function () {
+        var root = document.documentElement;
+        root.classList.add('js');
+        // The short welcome screen shows once per visit, and never with reduced motion or Data Saver
+        try {
+          var calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          var saveData = navigator.connection && navigator.connection.saveData;
+          // The scroll-driven "Bean to cup" story; reduced motion gets still drawings instead
+          if (!calm) root.classList.add('story');
+          if (!calm && !saveData && !sessionStorage.getItem('cc-welcomed')) {
+            root.classList.add('preload');
+            sessionStorage.setItem('cc-welcomed', '1');
+          }
+        } catch (e) {}
+        // If the motion script hasn't started by now, show everything as it is
+        setTimeout(function () {
+          if (!window.__ccMotion) {
+            root.classList.add('motion-off');
+            root.classList.remove('preload', 'story');
+          }
+        }, 5000);
+      })();
+    </script>
     <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
   </head>
   <body>
+    <InkDefs />
+    <Preloader />
     <a class="skip-link" href="#main">Skip to content</a>
     <slot />
     <script>
-      const items = document.querySelectorAll('.reveal');
-      if ('IntersectionObserver' in window) {
-        const observer = new IntersectionObserver(
-          (entries) => {
-            for (const entry of entries) {
-              if (entry.isIntersecting) {
-                entry.target.classList.add('is-in');
-                observer.unobserve(entry.target);
-              }
-            }
-          },
-          { rootMargin: '0px 0px -8% 0px', threshold: 0.05 },
-        );
-        items.forEach((item) => observer.observe(item));
-      } else {
-        items.forEach((item) => item.classList.add('is-in'));
-      }
+      import '../scripts/site-motion';
+      import '../scripts/story';
     </script>
   </body>
 </html>

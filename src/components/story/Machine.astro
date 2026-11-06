@@ -1,0 +1,143 @@
+---
+// A classic espresso machine, in the same fine line and three-quarter view as
+// the grinder: a cup rail on top, an engraved front panel, a pressure gauge,
+// a group head, a steam wand and a drip tray.
+//
+// Drawn inside the grinder's scene (Grinder.astro), to the left of the grinder,
+// where the story's camera pans to. It comes in two parts so the portafilter
+// can sit between them: `back` (everything behind the portafilter) and `front`
+// (the group head the portafilter locks up into).
+//
+// Hooks for the story script:
+//   [data-machine-part]    the two parts (faded back behind the finished cup at the end)
+//   [data-machine-reveal]  clip rect that draws the machine in from the bottom up
+//   [data-machine-shade]   tones and hatching, faded in after the lines
+//   [data-needle]          the gauge needle (rotates about the gauge's centre, 94,176)
+interface Props {
+  part: 'back' | 'front';
+  uid: string;
+}
+
+const { part, uid } = Astro.props;
+const clip = `url(#${uid}-machine-reveal)`;
+
+// The pressure gauge sits to the upper left (off-centre, as on many classic machines)
+const GAUGE = { x: 94, y: 176, r: 18 };
+// Its ticks, from low-left round to high-right
+const ticks = Array.from({ length: 9 }, (_, i) => {
+  const a = ((-135 + i * 33.75) * Math.PI) / 180;
+  const r1 = i % 2 === 0 ? 11 : 12.5;
+  const r2 = 15;
+  return `M${(GAUGE.x + Math.sin(a) * r1).toFixed(2)} ${(GAUGE.y - Math.cos(a) * r1).toFixed(2)}L${(GAUGE.x + Math.sin(a) * r2).toFixed(2)} ${(GAUGE.y - Math.cos(a) * r2).toFixed(2)}`;
+});
+---
+
+{part === 'back' ? (
+  <g transform="translate(-450 0)" data-machine-part>
+    <clipPath id={`${uid}-machine-reveal`}>
+      <rect data-machine-reveal x="-20" y="-20" width="320" height="440"></rect>
+    </clipPath>
+    <g clip-path={clip}>
+      <!-- Body: tones and shading -->
+      <path class="fw" d="M58 128H222V338H58Z"></path>
+      <g data-machine-shade>
+        <path class="fs t" d="M58 128H222V338H58Z"></path>
+        <path class="fs t" d="M58 128L74 116H238L222 128Z"></path>
+        <path class="fc t" d="M222 128L238 116V326L222 338Z"></path>
+        <path class="h" fill="url(#ink-hatch)" d="M222 128L238 116V326L222 338Z"></path>
+        <path class="h" fill="url(#ink-cross)" d="M222 250L238 238V326L222 338Z"></path>
+        <path class="h" fill="url(#ink-hatch)" d="M196 138H214V330H196Z" style="opacity: calc(var(--hatch, 0.55) * 0.5)"></path>
+      </g>
+      <path class="o" d="M58 128H222V338H58Z"></path>
+      <path class="o" d="M58 128L74 116H238L222 128Z"></path>
+      <path class="o" d="M222 128L238 116V326L222 338"></path>
+      <path class="d" d="M66 138H214V330H66Z"></path>
+      <path class="d" d="M70 142H210V326H70Z"></path>
+
+      <!-- Cup rail -->
+      <path class="o" d="M64 114H220L234 103"></path>
+      <path class="d" d="M64 114V124M220 114V125M234 103V113M142 114V124"></path>
+
+      <!-- Wordmark, engraved along the top of the panel -->
+      <text class="mark" x="152" y="160" text-anchor="middle">Espresso</text>
+      <path class="d" d="M124 165H180"></path>
+
+      <!-- Pressure gauge -->
+      <circle class="fw" cx={GAUGE.x} cy={GAUGE.y} r={GAUGE.r}></circle>
+      <g data-machine-shade>
+        <path class="h" fill="url(#ink-cross)" d={`M${GAUGE.x + 13} ${GAUGE.y - 12.5}A${GAUGE.r} ${GAUGE.r} 0 0 1 ${GAUGE.x} ${GAUGE.y + GAUGE.r}A${GAUGE.r} ${GAUGE.r} 0 0 0 ${GAUGE.x + 13} ${GAUGE.y - 12.5}Z`}></path>
+      </g>
+      <circle class="o" cx={GAUGE.x} cy={GAUGE.y} r={GAUGE.r}></circle>
+      <circle class="d" cx={GAUGE.x} cy={GAUGE.y} r={GAUGE.r - 2.5}></circle>
+      {ticks.map((d) => <path class="d" d={d}></path>)}
+      <g data-needle transform={`rotate(-120 ${GAUGE.x} ${GAUGE.y})`}>
+        <path class="o k" d={`M${GAUGE.x} ${GAUGE.y + 2}V${GAUGE.y - 13}`}></path>
+      </g>
+      <circle class="fk" cx={GAUGE.x} cy={GAUGE.y} r="1.8"></circle>
+
+      <!-- Group head mount: a plate bolted to the body, with the lever above -->
+      <path class="fw" d="M98 206H182V220H98Z"></path>
+      <g data-machine-shade>
+        <path class="fs t" d="M98 206H182V220H98Z"></path>
+        <path class="h" fill="url(#ink-hatch)" d="M98 216H182V220H98Z"></path>
+      </g>
+      <path class="o" d="M98 206H182V220H98Z"></path>
+      <circle class="d" cx="104" cy="213" r="1.6"></circle>
+      <circle class="d" cx="176" cy="213" r="1.6"></circle>
+      <path class="o" d="M166 206L190 182"></path>
+      <path class="o" d="M169.5 206L192.5 184.5"></path>
+      <circle class="fw" cx="193" cy="181" r="4.5"></circle>
+      <g data-machine-shade>
+        <circle class="fc t" cx="193" cy="181" r="4.5"></circle>
+      </g>
+      <circle class="o" cx="193" cy="181" r="4.5"></circle>
+
+      <!-- Steam wand -->
+      <path class="o" d="M214 200C232 202 236 216 234 238L231 290"></path>
+      <path class="o" d="M214 205C228 207 231 218 229.5 238L227 290"></path>
+      <ellipse class="fw" cx="229" cy="292" rx="3" ry="1.4"></ellipse>
+      <ellipse class="o" cx="229" cy="292" rx="3" ry="1.4"></ellipse>
+
+      <!-- Drip tray -->
+      <path class="fw" d="M36 350L52 338H260L244 350Z"></path>
+      <g data-machine-shade>
+        <path class="h" fill="url(#ink-cross)" d="M36 350L52 338H260L244 350Z"></path>
+        <path class="fs t" d="M36 350H244V372H36Z"></path>
+        <path class="fc t" d="M244 350L260 338V360L244 372Z"></path>
+        <path class="h" fill="url(#ink-hatch)" d="M244 350L260 338V360L244 372Z"></path>
+      </g>
+      <path class="o" d="M36 350L52 338H260L244 350Z"></path>
+      <path class="o" d="M36 350H244V372H36Z"></path>
+      <path class="o" d="M244 350L260 338V360L244 372"></path>
+      <path class="d" d="M44 356H236V366H44Z"></path>
+    </g>
+  </g>
+) : (
+  <g transform="translate(-450 0)" data-machine-part>
+    <g clip-path={clip}>
+      <!-- Group head: a ribbed brass cylinder below the mount, and the ring the
+           portafilter locks up into -->
+      <path class="fw" d="M114 220H166V238H114Z"></path>
+      <path class="fw" d="M119 238H161V250H119Z"></path>
+      <g data-machine-shade>
+        <path class="fs t" d="M114 220H166V238H114Z"></path>
+        <path class="h" fill="url(#ink-hatch)" d="M152 220H166V238H152Z"></path>
+        <path class="h" fill="url(#ink-cross)" d="M150 238H161V250H150Z"></path>
+      </g>
+      <path class="o" d="M114 220H166V238H114Z"></path>
+      <path class="d" d="M114 225H166M114 230H166M114 235H166"></path>
+      <path class="o" d="M119 238H161V250H119Z"></path>
+      <ellipse class="o" cx="140" cy="250" rx="22" ry="4"></ellipse>
+    </g>
+  </g>
+)}
+
+<style>
+  .mark {
+    fill: var(--accent);
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-style: italic;
+    letter-spacing: 0.04em;
+  }
+</style>

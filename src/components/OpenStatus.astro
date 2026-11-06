@@ -41,8 +41,16 @@ import { site } from '../data/site';
     background: var(--accent);
   }
 
+  /* While the cafe is open, the dot breathes slowly: a quiet sign of life */
   [data-open='true'] .dot {
     background: #4d7c59;
+    animation: breathe 3.2s var(--ease-steam) infinite alternate;
+  }
+
+  @keyframes breathe {
+    to {
+      opacity: 0.55;
+    }
   }
 
   [data-open='false'] .dot {

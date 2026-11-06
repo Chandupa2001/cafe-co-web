@@ -1,0 +1,52 @@
+---
+// A portafilter in side view, in the same fine line: a steel basket with
+// locking lugs, twin spouts beneath, and a long turned wooden handle.
+//
+// Drawn inside the grinder's scene (Grinder.astro), standing on the counter to
+// the left of the grinder, just out of view until the story's camera pans to it.
+// Its origin is the centre of the basket's rim, so the story can move it there
+// and twist it about that point to lock it into the machine.
+//
+// Hooks for the story script:
+//   [data-portafilter]  the whole thing (moved and turned)
+//   [data-grounds]      the heap of grounds in the basket (grows upward from the rim)
+---
+
+<g data-portafilter transform="translate(-16 352)">
+  <!-- Handle: steel collar and wooden grip -->
+  <path class="fw" d="M-21 3L-34 5V10L-21 11Z"></path>
+  <path class="o" d="M-21 3L-34 5V10L-21 11"></path>
+  <path class="fw" d="M-34 5C-52 3 -74 7 -92 9C-97 9.5 -97 15.5 -92 16C-74 17.5 -52 13 -34 10Z"></path>
+  <g>
+    <path class="fc t" d="M-34 5C-52 3 -74 7 -92 9C-97 9.5 -97 15.5 -92 16C-74 17.5 -52 13 -34 10Z"></path>
+    <path class="h" fill="url(#ink-cross)" d="M-34 8C-52 9 -74 12 -94 13C-96 15 -95 15.8 -92 16C-74 17.5 -52 13 -34 10Z"></path>
+  </g>
+  <path class="d" d="M-40 7.2C-56 6.4 -74 9.2 -90 11"></path>
+  <path class="o" d="M-34 5C-52 3 -74 7 -92 9C-97 9.5 -97 15.5 -92 16C-74 17.5 -52 13 -34 10Z"></path>
+
+  <!-- Spout: one short body, splitting into two close nozzles -->
+  <path class="fw" d="M-5 19H5L3.5 24H-3.5Z"></path>
+  <path class="o" d="M-5 19H5L3.5 24H-3.5Z"></path>
+  <path class="d" d="M-2.2 24L-2.6 27.5M2.2 24L2.6 27.5"></path>
+
+  <!-- Basket -->
+  <path class="fw" d="M-22 0C-21 10 -17 17 -10 19H10C17 17 21 10 22 0Z"></path>
+  <g>
+    <path class="fs t" d="M-22 0C-21 10 -17 17 -10 19H10C17 17 21 10 22 0Z"></path>
+    <path class="h" fill="url(#ink-hatch)" d="M10 0C12 8 10 15 5 19H10C17 17 21 10 22 0Z"></path>
+  </g>
+  <path class="o" d="M-22 0C-21 10 -17 17 -10 19H10C17 17 21 10 22 0"></path>
+  <path class="d" d="M-20 7C-12 10 12 10 20 7"></path>
+  <!-- Small locking lugs on the rim -->
+  <path class="d" d="M-22 1H-24.5V3H-21.5M22 1H24.5V3H21.5"></path>
+
+  <!-- Inside the basket, then the grounds heaped in it -->
+  <ellipse class="fw" cx="0" cy="0" rx="22" ry="4.5"></ellipse>
+  <ellipse cx="0" cy="0.4" rx="20" ry="3.6" fill="url(#ink-cross)"></ellipse>
+  <g data-grounds transform="scale(1 0)">
+    <path class="fc" d="M-20 0C-13 -6 13 -6 20 0A20 3.6 0 0 1 -20 0Z"></path>
+    <path fill="url(#ink-stipple)" d="M-20 0C-13 -6 13 -6 20 0A20 3.6 0 0 1 -20 0Z"></path>
+    <path class="d" d="M-20 0C-13 -6 13 -6 20 0"></path>
+  </g>
+  <ellipse class="o" cx="0" cy="0" rx="22" ry="4.5"></ellipse>
+</g>

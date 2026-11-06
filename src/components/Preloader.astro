@@ -1,0 +1,102 @@
+---
+// A short welcome on the first visit of a session: the seal opens like a stamp
+// with a little steam rising above it, then the page shows. About 1.2 seconds.
+// It runs on CSS alone, so it always finishes on time. The head script in
+// Base.astro decides whether to show it (never with reduced motion or Data Saver).
+import seal from '../assets/brand/seal-brown.svg';
+---
+
+<div class="preloader" aria-hidden="true">
+  <svg class="wisps" viewBox="0 0 60 40" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round">
+    <path d="M19 38 C 13 30, 25 24, 19 15 S 23 5, 21 2" pathLength="1" />
+    <path d="M30 38 C 24 28, 36 22, 30 12 S 34 3, 31 0" pathLength="1" />
+    <path d="M41 38 C 35 30, 47 24, 41 15 S 45 5, 43 2" pathLength="1" />
+  </svg>
+  <img class="seal" src={seal.src} width={seal.width} height={seal.height} alt="" decoding="async" fetchpriority="low" />
+</div>
+
+<style>
+  .preloader {
+    display: none;
+  }
+
+  :global(html.preload) .preloader {
+    position: fixed;
+    z-index: 200;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: var(--white);
+    color: var(--accent);
+    animation: lift 500ms var(--ease-steam) 700ms forwards;
+  }
+
+  .seal {
+    width: 6.5rem;
+    height: auto;
+    clip-path: circle(0% at 50% 50%);
+    animation: stamp 900ms var(--ease-pour) forwards;
+  }
+
+  .wisps {
+    width: 2.75rem;
+    height: auto;
+  }
+
+  .wisps path {
+    opacity: 0;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: steam 1100ms var(--ease-steam) forwards;
+  }
+
+  .wisps path:nth-child(1) {
+    animation-delay: 150ms;
+  }
+
+  .wisps path:nth-child(2) {
+    animation-delay: 50ms;
+  }
+
+  .wisps path:nth-child(3) {
+    animation-delay: 250ms;
+  }
+
+  @keyframes stamp {
+    to {
+      clip-path: circle(75% at 50% 50%);
+    }
+  }
+
+  @keyframes steam {
+    0% {
+      opacity: 0;
+      stroke-dashoffset: 1;
+      transform: translateY(4px);
+    }
+    40% {
+      opacity: 0.55;
+    }
+    100% {
+      opacity: 0;
+      stroke-dashoffset: 0;
+      transform: translateY(-6px);
+    }
+  }
+
+  @keyframes lift {
+    to {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html.preload) .preloader {
+      display: none;
+    }
+  }
+</style>

@@ -1,14 +1,22 @@
 ---
+// The headline is split into words here, at build time, so each can fade in
+// gently without shifting the layout. The heading keeps its full sentence as
+// its accessible name.
+const lead = 'A little corner of Maharagama where every cup is crafted with love. Come for the coffee,';
+const close = 'stay for the calm.';
+const words = (text: string) => text.split(' ');
 ---
 
 <section class="section statement">
-  <div class="wrap inner reveal">
-    <p class="eyebrow">Since 2026</p>
-    <h2 class="display">
-      A little corner of Maharagama where every cup is crafted with love. Come for the coffee,
-      <em>stay for the calm.</em>
+  <div class="wrap inner">
+    <p class="eyebrow" data-reveal="fade">Since 2026</p>
+    <h2 class="display" data-reveal="words" aria-label={`${lead} ${close}`}>
+      <span aria-hidden="true">
+        {words(lead).map((word) => <><span class="w">{word}</span>{' '}</>)}
+        <em>{words(close).map((word, i, all) => <><span class="w">{word}</span>{i < all.length - 1 && ' '}</>)}</em>
+      </span>
     </h2>
-    <p class="note">Everyone gets a friendly welcome here. Brew. Relax. Repeat.</p>
+    <p class="note" data-reveal="fade" data-delay="0.5">Everyone gets a friendly welcome here. Brew. Relax. Repeat.</p>
   </div>
 </section>
 
@@ -24,6 +32,10 @@
   .display {
     font-size: clamp(2.125rem, 6vw, 3.75rem);
     line-height: 1.12;
+  }
+
+  .w {
+    display: inline-block;
   }
 
   .note {

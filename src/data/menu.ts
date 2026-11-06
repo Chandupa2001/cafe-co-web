@@ -3,7 +3,7 @@
 // THESE ITEMS AND PRICES ARE SAMPLES, not the real menu. Once they're replaced,
 // set `sample` to false: this removes the "Sample menu" note from the page and
 // clears the warning from `npm run check:launch`.
-export const sample = true;
+export const sample = false;
 
 export const menu = [
   {

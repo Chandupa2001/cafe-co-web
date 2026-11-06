@@ -1,0 +1,81 @@
+---
+// A roasted coffee bean in fine line: a slightly uneven oval, an ink crease,
+// a light all-over hatch for the roast and cross-hatching on its shadow side.
+// Two variants so the pair never looks copy-pasted.
+// Everything is drawn inside `.body`, which the story script clips when it
+// cracks a bean into pieces (src/scripts/story.ts).
+
+interface Props {
+  variant?: 1 | 2;
+  class?: string;
+  style?: string;
+  /** Position and size when drawn inside another drawing (as a nested SVG). */
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+}
+
+const { variant = 1, class: className, style, x, y, width, height } = Astro.props;
+const uid = `bean-${Math.random().toString(36).slice(2, 8)}`;
+
+const shapes = {
+  1: {
+    outline: 'M30 3.5C45.5 3 55.5 19 56 40C56.5 61 46 76.5 30.5 77C14.5 77.5 4 62 3.8 41C3.6 20 14 4 30 3.5Z',
+    crease: 'M31.5 8C23.5 21 37.5 31 30.5 41C23.5 51 36 61 28.5 72.5',
+    groove: 'M34.2 10.5C27.5 22 40 32.5 33.5 42.5C27.5 52 38 61.5 31.6 70',
+    // The sliver between crease and groove, cross-hatched so the crease reads deep
+    cleft: 'M31.5 8C23.5 21 37.5 31 30.5 41C23.5 51 36 61 28.5 72.5L31.6 70C38 61.5 27.5 52 33.5 42.5C40 32.5 27.5 22 34.2 10.5Z',
+    shade: 'M31.5 8C23.5 21 37.5 31 30.5 41C23.5 51 36 61 28.5 72.5L30 80H62V0H30Z',
+    form: ['M9.6 27C7.9 35 7.7 46 9.9 55', 'M15 15.5C12.6 19 11.2 22.5 10.6 26'],
+  },
+  2: {
+    outline: 'M29 4C46 4.5 56.5 21 56 41.5C55.5 61.5 44 76 28.5 76C13 76 3.5 60 4.2 39.5C4.8 19.5 13.5 3.5 29 4Z',
+    crease: 'M28.5 8.5C36 21 23 30.5 29.5 40.5C36 50.5 24 60.5 31 71.5',
+    groove: 'M31.6 10.2C38.2 22.5 26.2 31.5 32.6 41.6C38.6 51.5 27.4 60.5 33.8 69.5',
+    cleft: 'M28.5 8.5C36 21 23 30.5 29.5 40.5C36 50.5 24 60.5 31 71.5L33.8 69.5C27.4 60.5 38.6 51.5 32.6 41.6C26.2 31.5 38.2 22.5 31.6 10.2Z',
+    shade: 'M28.5 8.5C36 21 23 30.5 29.5 40.5C36 50.5 24 60.5 31 71.5L31 80H62V0H29Z',
+    form: ['M10 25.5C8.2 33.5 8.1 45 10.4 54.5', 'M12.4 61C14.4 65.5 17.4 69 21 71.5'],
+  },
+}[variant];
+---
+
+<svg
+  class:list={['ink bean', className]}
+  style={style}
+  viewBox="0 0 60 80"
+  x={x}
+  y={y}
+  width={width}
+  height={height}
+  aria-hidden="true"
+  focusable="false"
+>
+  <defs>
+    <clipPath id={`${uid}-clip`}>
+      <path d={shapes.outline}></path>
+    </clipPath>
+  </defs>
+
+  <g class="body">
+  <!-- Roasted tone -->
+  <path class="fc t" d={shapes.outline}></path>
+
+  <!-- A light all-over hatch reads as roast; the shadow side deepens to cross-hatch -->
+  <g clip-path={`url(#${uid}-clip)`}>
+    <path d={shapes.outline} fill="url(#ink-hatch)" style="opacity: calc(var(--hatch, 0.55) * 0.75)"></path>
+    <path class="h" d={shapes.shade} fill="url(#ink-cross)"></path>
+    <ellipse class="h" cx="52" cy="42" rx="9" ry="31" fill="url(#ink-cross)"></ellipse>
+  </g>
+
+  <!-- Engraved form lines on the lit side -->
+  {shapes.form.map((d) => <path class="d" d={d}></path>)}
+
+  <!-- The crease: a shaded cleft, a fine second line for its depth, then the ink line -->
+  <path d={shapes.cleft} fill="url(#ink-cross)" style="opacity: min(1, calc(var(--hatch, 0.55) * 1.4))"></path>
+  <path class="d k" d={shapes.groove}></path>
+  <path class="o k" d={shapes.crease}></path>
+
+  <path class="o" d={shapes.outline}></path>
+  </g>
+</svg>
